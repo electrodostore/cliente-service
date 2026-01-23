@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter  @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+//Solo se definen datos que el cliente (view) puede ingresar o actualizar
 public class ClienteRequestDto {
 
     private String name;

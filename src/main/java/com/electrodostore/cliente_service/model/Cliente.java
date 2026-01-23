@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter  @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity  //Entidad Cliente para registro de clientes de la tienda
 public class Cliente {
 
     @Id

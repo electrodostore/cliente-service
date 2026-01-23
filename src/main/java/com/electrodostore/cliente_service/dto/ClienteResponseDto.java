@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter  @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+//Se definene los datos que el cliente (view) puede ver
 public class ClienteResponseDto {
 
     private Long id;
