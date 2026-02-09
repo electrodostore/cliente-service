@@ -1,11 +1,13 @@
 package com.electrodostore.cliente_service.service;
 
+import com.electrodostore.cliente_service.Integration.venta.dto.VentaDto;
+import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 
 import java.util.List;
 
-//Intefaz declarativa de las operaciones que hace el dominio Cliente
+//Interfaz declarativa de las operaciones que hace el dominio Cliente
 public interface IClienteService {
 
     //Traer todos
@@ -17,7 +19,7 @@ public interface IClienteService {
     //Guardar registro
     ClienteResponseDto saveCliente(ClienteRequestDto newClient);
 
-    //Eliminar por id
+    //Eliminar por ID
     void deleteCliente(Long id);
 
     //Actualización completa
@@ -25,4 +27,7 @@ public interface IClienteService {
 
     //Actualización parcial
     ClienteResponseDto patchCliente(Long id, ClienteRequestDto updatedClient);
+
+    //Método de exposición de ventas de un determinado cliente y los datos de este mismo
+    ClienteConVentasDto findClienteVentas(Long clientId);
 }

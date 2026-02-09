@@ -1,5 +1,8 @@
 package com.electrodostore.cliente_service.service;
 
+import com.electrodostore.cliente_service.Integration.venta.VentaIntegrationService;
+import com.electrodostore.cliente_service.Integration.venta.dto.VentaDto;
+import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 import com.electrodostore.cliente_service.exception.ClienteNotFoundException;
@@ -15,10 +18,15 @@ import java.util.Optional;
 @Service
 public class ClienteService implements IClienteService{
 
+    //Inyección de dependencia para el repository de cliente
     private final IClienteRepository clienteRepo;
-
-    //Inyección de dependenica por constructor para el repository de cliente
-    public ClienteService(IClienteRepository clienteRepo){this.clienteRepo = clienteRepo;}
+    //Inyección de dependencia para el cliente de venta-service
+    private final VentaIntegrationService ventaClient;
+    //Inyección por constructor
+    public ClienteService(IClienteRepository clienteRepo, VentaIntegrationService ventaClient){
+        this.clienteRepo = clienteRepo;
+        this.ventaClient = ventaClient;
+    }
 
     //Método propio para sacar una instancia de la clase ClienteResponse que es la que se expone al cliente (view)
     private ClienteResponseDto buildClienteResponse(Cliente objCliente){
@@ -118,5 +126,20 @@ public class ClienteService implements IClienteService{
         clienteRepo.save(objCliente);
 
         return buildClienteResponse(objCliente);
+    }
+
+    @Override
+    public ClienteConVentasDto findClienteVentas(Long clientId) {
+        //Traemos al cliente dueño de las ventas
+        Cliente objCliente = findCliente(clientId);
+
+        //Buscamos ventas del cliente
+        List<VentaDto> listVentas = ventaClient.findClienteVentas(clientId);
+
+        //Retornamos objeto de integración del cliente y sus ventas
+        return new ClienteConVentasDto(
+                listVentas,
+                buildClienteResponse(objCliente)
+        );
     }
 }

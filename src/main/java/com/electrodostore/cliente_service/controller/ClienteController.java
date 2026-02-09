@@ -1,5 +1,6 @@
 package com.electrodostore.cliente_service.controller;
 
+import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 import com.electrodostore.cliente_service.service.IClienteService;
@@ -27,6 +28,11 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.findClienteResponse(id));
     }
 
+    @GetMapping("traer-ventas/{clientId}")
+    public ResponseEntity<ClienteConVentasDto> findClienteVentas(@PathVariable Long clientId){
+        return ResponseEntity.ok(clienteService.findClienteVentas(clientId));
+    }
+
     @PostMapping
     public ResponseEntity<ClienteResponseDto> saveCliente(@RequestBody ClienteRequestDto objNuevo){
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -48,4 +54,6 @@ public class ClienteController {
     public ResponseEntity<ClienteResponseDto> patchCliente(@PathVariable Long id, @RequestBody ClienteRequestDto updatedClient){
         return ResponseEntity.ok(clienteService.patchCliente(id, updatedClient));
     }
+
+
 }
