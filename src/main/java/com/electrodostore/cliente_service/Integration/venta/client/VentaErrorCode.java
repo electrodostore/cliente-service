@@ -1,4 +1,0 @@
-package com.electrodostore.cliente_service.Integration.venta.client;
-
-public class VentaErrorCode {
-}
