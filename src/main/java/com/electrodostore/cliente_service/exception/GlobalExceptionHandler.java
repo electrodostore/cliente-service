@@ -29,10 +29,18 @@ public class GlobalExceptionHandler {
     }
 
     /*Manejador de la excepción ClienteNotFound hace que si la excepción
-    es por un cliente no encontrado, me tome esta response completa y me la envie a la vista*/
+    es por un cliente no encontrado, me tome esta response completa y me la envíe al cliente*/
     @ExceptionHandler(ClienteNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handlerClienteNotFound(ClienteNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), ex.getErrorCode().name()));
     }
+
+    //Manejador de la excepción ServiceUnavailable
+    @ExceptionHandler(ServiceUnavailable.class)
+    public ResponseEntity<Map<String, Object>> handlerServiceUnavailable(ServiceUnavailable ex){
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(buildErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), ex.getErrorCode().name()));
+    }
+
 }
