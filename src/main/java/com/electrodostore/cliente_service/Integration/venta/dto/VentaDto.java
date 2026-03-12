@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 //Clase DTO donde se van a almacenar los datos de cada venta una vez sean deserealizados
 public class VentaDto {
+    private Long id;
     private LocalDate date;
     private Integer totalItems;
     private BigDecimal totalPrice;
