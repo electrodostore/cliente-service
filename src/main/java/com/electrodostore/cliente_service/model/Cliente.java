@@ -23,5 +23,5 @@ public class Cliente {
     private String document;
     private String address;
     //Estado del cliente
-    private boolean active;
+    private boolean active=true;
 }
