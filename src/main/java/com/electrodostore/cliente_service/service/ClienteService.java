@@ -30,8 +30,14 @@ public class ClienteService implements IClienteService{
 
     //Método propio para sacar una instancia de la clase ClienteResponse que es la que se expone al cliente (view)
     private ClienteResponseDto buildClienteResponse(Cliente objCliente){
-        return new ClienteResponseDto(objCliente.getId(), objCliente.getName(), objCliente.getCellphone(),
-                objCliente.getDocument(), objCliente.getAddress());
+        return new ClienteResponseDto(
+                objCliente.getId(),
+                objCliente.getName(),
+                objCliente.getCellphone(),
+                objCliente.getDocument(),
+                objCliente.getAddress(),
+                objCliente.isActive()
+        );
     }
 
     //Método propio para buscar a un cliente por su id o throw exception en caso de que no exista
@@ -43,6 +49,12 @@ public class ClienteService implements IClienteService{
         if(objCliente.isEmpty()){throw new ClienteNotFoundException("No se encontró cliente con id: " + id);}
 
         return objCliente.get();
+    }
+
+    private void validarEstadoCliente(Cliente cliente){
+        if(!cliente.isActive()){
+            throw new ClienteNotFoundException("No se encontró cliente activo con id: " + cliente.getId());
+        }
     }
 
     @Override
@@ -98,6 +110,8 @@ public class ClienteService implements IClienteService{
     public ClienteResponseDto updateCliente(Long id, ClienteRequestDto updatedClient) {
         Cliente objCliente = findCliente(id);
 
+        validarEstadoCliente(objCliente);
+
         //Actualización completa de los datos del cliente
         objCliente.setName(updatedClient.getName());
         objCliente.setCellphone(updatedClient.getCellphone());
@@ -114,6 +128,8 @@ public class ClienteService implements IClienteService{
     @Transactional
     public ClienteResponseDto patchCliente(Long id, ClienteRequestDto updatedClient) {
         Cliente objCliente = findCliente(id);
+
+        validarEstadoCliente(objCliente);
 
         //Actualización parcial de los datos del cliente
         if(updatedClient.getName() != null){objCliente.setName(updatedClient.getName());}
