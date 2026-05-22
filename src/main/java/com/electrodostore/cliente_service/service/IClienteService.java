@@ -17,7 +17,7 @@ public interface IClienteService {
     ClienteResponseDto findClienteResponse(Long id);
 
     //Guardar registro
-    ClienteResponseDto saveCliente(ClienteRequestDto newClient);
+    Long saveCliente(ClienteRequestDto newClient);
 
     //Eliminar por ID
     void deleteCliente(Long id);

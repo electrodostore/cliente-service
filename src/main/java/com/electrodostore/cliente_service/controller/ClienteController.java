@@ -34,7 +34,7 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<ClienteResponseDto> saveCliente(@RequestBody ClienteRequestDto objNuevo){
+    public ResponseEntity<Long> saveCliente(@RequestBody ClienteRequestDto objNuevo){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(clienteService.saveCliente(objNuevo));
     }

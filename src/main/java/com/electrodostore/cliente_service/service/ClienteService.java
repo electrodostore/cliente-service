@@ -70,7 +70,7 @@ public class ClienteService implements IClienteService{
 
     @Override
     @Transactional
-    public ClienteResponseDto saveCliente(ClienteRequestDto newClient) {
+    public Long saveCliente(ClienteRequestDto newClient) {
         Cliente objCliente = new Cliente();
 
         //Migramos datos del dto al objeto de la clase entidad
@@ -80,9 +80,8 @@ public class ClienteService implements IClienteService{
         objCliente.setAddress(newClient.getAddress());
 
         //Se guarda el registro
-        clienteRepo.save(objCliente);
+        return clienteRepo.save(objCliente).getId();
 
-        return buildClienteResponse(objCliente);
     }
 
     @Override
