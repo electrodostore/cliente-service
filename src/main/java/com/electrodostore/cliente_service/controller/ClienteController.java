@@ -39,9 +39,10 @@ public class ClienteController {
                 .body(clienteService.saveCliente(objNuevo));
     }
 
+    //Soft Delete
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCliente(@PathVariable Long id){
-        clienteService.deleteCliente(id);
+    public ResponseEntity<Void> disableCliente(@PathVariable Long id){
+        clienteService.disableCliente(id);
         return ResponseEntity.noContent().build();
     }
 

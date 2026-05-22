@@ -19,8 +19,8 @@ public interface IClienteService {
     //Guardar registro
     Long saveCliente(ClienteRequestDto newClient);
 
-    //Eliminar por ID
-    void deleteCliente(Long id);
+    //Se aplica Soft Delete para evitar perder datos históricos del usuario una vez se desactive
+    void disableCliente(Long id);
 
     //Actualización completa
     ClienteResponseDto updateCliente(Long id, ClienteRequestDto updatedClient);

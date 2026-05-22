@@ -86,11 +86,11 @@ public class ClienteService implements IClienteService{
 
     @Override
     @Transactional
-    public void deleteCliente(Long id) {
-        //Si no existe cliente, lo sabremos gracias a esta busqueda
+    public void disableCliente(Long id) {
         Cliente objCliente = findCliente(id);
 
-        clienteRepo.delete(objCliente);
+        //Borrado lógico
+        objCliente.setActive(false);
     }
 
     @Override
