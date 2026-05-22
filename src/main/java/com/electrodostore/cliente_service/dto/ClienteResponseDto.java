@@ -16,4 +16,5 @@ public class ClienteResponseDto {
     private String cellphone;
     private String document;
     private String address;
+    private boolean active;
 }
