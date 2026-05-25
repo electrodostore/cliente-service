@@ -56,5 +56,35 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.patchCliente(id, updatedClient));
     }
 
+    //Busca datos del cliente autenticado
+    @GetMapping("/me")
+    public ResponseEntity<ClienteResponseDto> findMe(){
+        return ResponseEntity.ok(
+                clienteService.findMe()
+        );
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<ClienteResponseDto> updateMe(@RequestBody ClienteRequestDto updatedClient){
+        return ResponseEntity.ok(
+                clienteService.updateMe(updatedClient)
+        );
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<ClienteResponseDto> patchMe(@RequestBody ClienteRequestDto updatedClient){
+        return ResponseEntity.ok(
+                clienteService.patchMe(updatedClient)
+        );
+    }
+
+    @GetMapping("/mis-ventas")
+    public ResponseEntity<ClienteConVentasDto> findVentas(){
+        return ResponseEntity.ok(
+                clienteService.findMyVentas()
+        );
+    }
+
+
 
 }

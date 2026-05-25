@@ -6,11 +6,17 @@ import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 import com.electrodostore.cliente_service.exception.ClienteNotFoundException;
+import com.electrodostore.cliente_service.exception.UnauthorizedOperationException;
 import com.electrodostore.cliente_service.model.Cliente;
 import com.electrodostore.cliente_service.repository.IClienteRepository;
+import feign.Client;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +61,26 @@ public class ClienteService implements IClienteService{
         if(!cliente.isActive()){
             throw new ClienteNotFoundException("No se encontró cliente activo con id: " + cliente.getId());
         }
+    }
+
+    //Extrae la identidad de cliente autenticado y retorna su id
+    private Long getAuthenticatedClientId(){
+        //Busca objeto con la información del token JWT
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        //Saca objeto Principal con todos los claims almacenamos en el token
+        Jwt principal = (Jwt) authentication.getPrincipal();
+
+        //Busca identidad de negocio del usuario
+        Number clientId = principal.getClaim("clientId");
+
+        //Valida que el usuario realmente sea cliente
+        if(clientId == null){throw new UnauthorizedOperationException("El usuario no es cliente, por lo que " +
+                "no puede realizar la operación");
+        }
+
+        return  clientId.longValue();
+
     }
 
     @Override
@@ -143,6 +169,7 @@ public class ClienteService implements IClienteService{
         return buildClienteResponse(objCliente);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ClienteConVentasDto findClienteVentas(Long clientId) {
         //Traemos al cliente dueño de las ventas
@@ -155,6 +182,43 @@ public class ClienteService implements IClienteService{
         return new ClienteConVentasDto(
                 listVentas,
                 buildClienteResponse(objCliente)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ClienteResponseDto findMe() {
+        //Busca cliente autenticado
+        Cliente cliente = findCliente(
+                getAuthenticatedClientId()
+        );
+
+        return buildClienteResponse(
+                cliente
+        );
+    }
+
+    @Transactional
+    @Override
+    public ClienteResponseDto updateMe(ClienteRequestDto updatedClient) {
+        return updateCliente(
+                getAuthenticatedClientId(), updatedClient
+        );
+    }
+
+    @Transactional
+    @Override
+    public ClienteResponseDto patchMe(ClienteRequestDto updatedClient) {
+        return patchCliente(
+                getAuthenticatedClientId(), updatedClient
+        );
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ClienteConVentasDto findMyVentas() {
+        return findClienteVentas(
+                getAuthenticatedClientId()
         );
     }
 }

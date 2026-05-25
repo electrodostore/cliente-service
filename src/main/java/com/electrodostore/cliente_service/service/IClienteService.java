@@ -22,12 +22,28 @@ public interface IClienteService {
     //Se aplica Soft Delete para evitar perder datos históricos del usuario una vez se desactive
     void disableCliente(Long id);
 
-    //Actualización completa
+    //Actualización completa administrativa
     ClienteResponseDto updateCliente(Long id, ClienteRequestDto updatedClient);
 
-    //Actualización parcial
+    //Actualización parcial administrativa
     ClienteResponseDto patchCliente(Long id, ClienteRequestDto updatedClient);
 
-    //Método de exposición de ventas de un determinado cliente y los datos de este mismo
+    /**
+     * Expone ventas de un determinado cliente y los datos de este mismo.
+     *
+     * Este método solo podrá ser accedido por administradores del sistema
+     */
     ClienteConVentasDto findClienteVentas(Long clientId);
+
+    /**
+     * Gestión de identidad del cliente.
+     *
+     * Solo se accederá a los recursos del cliente autenticado para evitar
+     * que usuarios no autorizado accedan o modifiquen recursos
+     * de otros clientes
+     */
+    ClienteResponseDto findMe();
+    ClienteResponseDto updateMe(ClienteRequestDto updatedClient);
+    ClienteResponseDto patchMe(ClienteRequestDto updatedClient);
+    ClienteConVentasDto findMyVentas();
 }
