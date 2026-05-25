@@ -5,5 +5,6 @@ public enum ClienteErrorCode {
 
     //Valores de errorCodes
     CLIENT_NOT_FOUND,
-    SERVICE_UNAVAILABLE
+    SERVICE_UNAVAILABLE,
+    UNAUTHORIZED_OPERATION
 }

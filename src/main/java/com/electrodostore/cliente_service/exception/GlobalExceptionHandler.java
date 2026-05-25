@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     private Map<String, Object> buildErrorResponse(HttpStatus status, String message, String errorCode){
         Map<String, Object> response = new LinkedHashMap<>();
 
-        //Definimos pares clave-valor para la response
+        //Definimos pares clave-valor para el body de la respuesta de error
         response.put("timestamp", LocalDateTime.now());
         response.put("status", status.value());
         response.put("error", status.getReasonPhrase());
@@ -41,6 +41,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handlerServiceUnavailable(ServiceUnavailable ex){
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(buildErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), ex.getErrorCode().name()));
+    }
+
+    //Manejador de la excepción ServiceUnavailable
+    @ExceptionHandler(UnauthorizedOperationException.class)
+    public ResponseEntity<Map<String, Object>> handlerUnauthorizedOperation(UnauthorizedOperationException ex){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), ex.getErrorCode().name()));
     }
 
 }
