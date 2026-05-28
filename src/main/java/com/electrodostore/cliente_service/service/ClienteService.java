@@ -59,7 +59,7 @@ public class ClienteService implements IClienteService{
 
     private void validarEstadoCliente(Cliente cliente){
         if(!cliente.isActive()){
-            throw new ClienteNotFoundException("No se encontró cliente activo con id: " + cliente.getId());
+            throw new ClienteNotFoundException("Cliente inactivo, no puede realizar la operación");
         }
     }
 
@@ -104,6 +104,18 @@ public class ClienteService implements IClienteService{
                 //Este método me busca un determinado cliente por su id, si no existe -> Exception
                 findCliente(id)
         );
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ClienteResponseDto findActiveClient(Long id) {
+        Cliente cliente = findCliente(
+                id
+        );
+
+        validarEstadoCliente(cliente);
+
+        return buildClienteResponse(cliente);
     }
 
     @Override

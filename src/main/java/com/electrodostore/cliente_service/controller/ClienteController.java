@@ -4,6 +4,7 @@ import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 import com.electrodostore.cliente_service.service.IClienteService;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +24,18 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.findAllClientes());
     }
 
+    //Consulta administrativa de un cliente por su id
     @GetMapping("/{id}")
     public ResponseEntity<ClienteResponseDto> findCliente(@PathVariable Long id){
         return ResponseEntity.ok(clienteService.findClienteResponse(id));
+    }
+
+    //Consulta solo clientes habilitados para realizar operaciones comerciales
+    @GetMapping("/{id}/availables")
+    public ResponseEntity<ClienteResponseDto> findActiveClient(@PathVariable Long id){
+        return ResponseEntity.ok(
+                clienteService.findActiveClient(id)
+        );
     }
 
     @GetMapping("traer-ventas/{clientId}")

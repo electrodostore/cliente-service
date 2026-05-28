@@ -10,11 +10,14 @@ import java.util.List;
 //Interfaz declarativa de las operaciones que hace el dominio Cliente
 public interface IClienteService {
 
-    //Traer todos
+    //Consulta todos los clientes en un contexto administrativo
     List<ClienteResponseDto> findAllClientes();
 
-    //Encontrar uno
+    //Consulta administrativa de un cliente
     ClienteResponseDto findClienteResponse(Long id);
+
+    //Consulta operacional de clientes activos
+    ClienteResponseDto findActiveClient(Long id);
 
     //Guardar registro
     Long saveCliente(ClienteRequestDto newClient);
