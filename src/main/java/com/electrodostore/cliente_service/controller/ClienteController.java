@@ -32,14 +32,14 @@ public class ClienteController {
     }
 
     //Consulta solo clientes habilitados para realizar operaciones comerciales
-    @GetMapping("/{id}/availables")
+    @GetMapping("/{id}/enabled")
     public ResponseEntity<ClienteResponseDto> findActiveClient(@PathVariable Long id){
         return ResponseEntity.ok(
                 clienteService.findActiveClient(id)
         );
     }
 
-    @GetMapping("traer-ventas/{clientId}")
+    @GetMapping("/{clientId}/ventas")
     public ResponseEntity<ClienteConVentasDto> findClienteVentas(@PathVariable Long clientId){
         return ResponseEntity.ok(clienteService.findClienteVentas(clientId));
     }
@@ -51,7 +51,7 @@ public class ClienteController {
     }
 
     //Soft Delete
-    @DeleteMapping("/{id}")
+    @PatchMapping("/{id}/disable")
     public ResponseEntity<Void> disableCliente(@PathVariable Long id){
         clienteService.disableCliente(id);
         return ResponseEntity.noContent().build();
@@ -89,7 +89,7 @@ public class ClienteController {
         );
     }
 
-    @GetMapping("/mis-ventas")
+    @GetMapping("/me/ventas")
     public ResponseEntity<ClienteConVentasDto> findVentas(){
         return ResponseEntity.ok(
                 clienteService.findMyVentas()
