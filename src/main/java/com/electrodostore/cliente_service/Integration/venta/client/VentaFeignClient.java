@@ -13,6 +13,6 @@ public interface VentaFeignClient {
 
     /*Descripción del método de venta-service que se encarga de buscar y traer la lista de ventas de un determinado
       cliente por su id */
-    @GetMapping("/ventas/traer-ventas-de-cliente/{clientId}")
+    @GetMapping("/ventas/cliente/{clientId}")
     List<VentaDto> findClienteVentas(@PathVariable Long clientId);
 }
