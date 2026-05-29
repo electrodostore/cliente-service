@@ -1,6 +1,7 @@
 package com.electrodostore.cliente_service.controller;
 
 import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
+import com.electrodostore.cliente_service.dto.ClientePatchRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 import com.electrodostore.cliente_service.service.IClienteService;
@@ -63,7 +64,7 @@ public class ClienteController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ClienteResponseDto> patchCliente(@PathVariable Long id, @RequestBody ClienteRequestDto updatedClient){
+    public ResponseEntity<ClienteResponseDto> patchCliente(@PathVariable Long id, @RequestBody @Valid ClientePatchRequestDto updatedClient){
         return ResponseEntity.ok(clienteService.patchCliente(id, updatedClient));
     }
 
@@ -83,7 +84,7 @@ public class ClienteController {
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<ClienteResponseDto> patchMe(@Valid @RequestBody ClienteRequestDto updatedClient){
+    public ResponseEntity<ClienteResponseDto> patchMe(@RequestBody @Valid ClientePatchRequestDto updatedClient){
         return ResponseEntity.ok(
                 clienteService.patchMe(updatedClient)
         );

@@ -3,6 +3,7 @@ package com.electrodostore.cliente_service.service;
 import com.electrodostore.cliente_service.Integration.venta.VentaIntegrationService;
 import com.electrodostore.cliente_service.Integration.venta.dto.VentaDto;
 import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
+import com.electrodostore.cliente_service.dto.ClientePatchRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 import com.electrodostore.cliente_service.exception.ClienteNotFoundException;
@@ -10,11 +11,13 @@ import com.electrodostore.cliente_service.exception.UnauthorizedOperationExcepti
 import com.electrodostore.cliente_service.model.Cliente;
 import com.electrodostore.cliente_service.repository.IClienteRepository;
 import feign.Client;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -81,6 +84,15 @@ public class ClienteService implements IClienteService{
 
         return  clientId.longValue();
 
+    }
+
+    private void validarNotBlank(String valor, String nombreCampo){
+        //Valida que no se obtenga un String vacío
+        if(valor.isBlank()){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, nombreCampo + " no puede estar vacío"
+            );
+        }
     }
 
     @Override
@@ -164,19 +176,31 @@ public class ClienteService implements IClienteService{
 
     @Override
     @Transactional
-    public ClienteResponseDto patchCliente(Long id, ClienteRequestDto updatedClient) {
+    public ClienteResponseDto patchCliente(Long id, ClientePatchRequestDto updatedClient) {
         Cliente objCliente = findCliente(id);
 
         validarEstadoCliente(objCliente);
 
         //Actualización parcial de los datos del cliente
-        if(updatedClient.name() != null){objCliente.setName(updatedClient.name());}
-        if(updatedClient.cellphone() != null){objCliente.setCellphone(updatedClient.cellphone());}
-        if(updatedClient.document() != null){objCliente.setDocument(updatedClient.document());}
-        if(updatedClient.address() != null){objCliente.setAddress(updatedClient.address());}
+        if(updatedClient.name() != null){
+            validarNotBlank(updatedClient.name(), "el nombre");
+            objCliente.setName(updatedClient.name());
+        }
 
-        //Se guardan los cambios
-        clienteRepo.save(objCliente);
+        if(updatedClient.cellphone() != null){
+            validarNotBlank(updatedClient.cellphone(), "el teléfono");
+            objCliente.setCellphone(updatedClient.cellphone());
+        }
+
+        if(updatedClient.document() != null){
+            validarNotBlank(updatedClient.document(), "el documento");
+            objCliente.setDocument(updatedClient.document());
+        }
+
+        if(updatedClient.address() != null){
+            validarNotBlank(updatedClient.address(), "la dirección");
+            objCliente.setAddress(updatedClient.address());
+        }
 
         return buildClienteResponse(objCliente);
     }
@@ -220,7 +244,7 @@ public class ClienteService implements IClienteService{
 
     @Transactional
     @Override
-    public ClienteResponseDto patchMe(ClienteRequestDto updatedClient) {
+    public ClienteResponseDto patchMe(ClientePatchRequestDto updatedClient) {
         return patchCliente(
                 getAuthenticatedClientId(), updatedClient
         );

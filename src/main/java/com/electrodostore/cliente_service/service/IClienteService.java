@@ -2,6 +2,7 @@ package com.electrodostore.cliente_service.service;
 
 import com.electrodostore.cliente_service.Integration.venta.dto.VentaDto;
 import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
+import com.electrodostore.cliente_service.dto.ClientePatchRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 
@@ -29,7 +30,7 @@ public interface IClienteService {
     ClienteResponseDto updateCliente(Long id, ClienteRequestDto updatedClient);
 
     //Actualización parcial administrativa
-    ClienteResponseDto patchCliente(Long id, ClienteRequestDto updatedClient);
+    ClienteResponseDto patchCliente(Long id, ClientePatchRequestDto updatedClient);
 
     /**
      * Expone ventas de un determinado cliente y los datos de este mismo.
@@ -47,6 +48,6 @@ public interface IClienteService {
      */
     ClienteResponseDto findMe();
     ClienteResponseDto updateMe(ClienteRequestDto updatedClient);
-    ClienteResponseDto patchMe(ClienteRequestDto updatedClient);
+    ClienteResponseDto patchMe(ClientePatchRequestDto updatedClient);
     ClienteConVentasDto findMyVentas();
 }
