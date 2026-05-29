@@ -124,10 +124,10 @@ public class ClienteService implements IClienteService{
         Cliente objCliente = new Cliente();
 
         //Migramos datos del dto al objeto de la clase entidad
-        objCliente.setName(newClient.getName());
-        objCliente.setCellphone(newClient.getCellphone());
-        objCliente.setDocument(newClient.getDocument());
-        objCliente.setAddress(newClient.getAddress());
+        objCliente.setName(newClient.name());
+        objCliente.setCellphone(newClient.cellphone());
+        objCliente.setDocument(newClient.document());
+        objCliente.setAddress(newClient.address());
 
         //Se guarda el registro
         return clienteRepo.save(objCliente).getId();
@@ -151,10 +151,10 @@ public class ClienteService implements IClienteService{
         validarEstadoCliente(objCliente);
 
         //Actualización completa de los datos del cliente
-        objCliente.setName(updatedClient.getName());
-        objCliente.setCellphone(updatedClient.getCellphone());
-        objCliente.setDocument(updatedClient.getDocument());
-        objCliente.setAddress(updatedClient.getAddress());
+        objCliente.setName(updatedClient.name());
+        objCliente.setCellphone(updatedClient.cellphone());
+        objCliente.setDocument(updatedClient.document());
+        objCliente.setAddress(updatedClient.address());
 
         //Se guardan los cambios
         clienteRepo.save(objCliente);
@@ -170,10 +170,10 @@ public class ClienteService implements IClienteService{
         validarEstadoCliente(objCliente);
 
         //Actualización parcial de los datos del cliente
-        if(updatedClient.getName() != null){objCliente.setName(updatedClient.getName());}
-        if(updatedClient.getCellphone() != null){objCliente.setCellphone(updatedClient.getCellphone());}
-        if(updatedClient.getDocument() != null){objCliente.setDocument(updatedClient.getDocument());}
-        if(updatedClient.getAddress() != null){objCliente.setAddress(updatedClient.getAddress());}
+        if(updatedClient.name() != null){objCliente.setName(updatedClient.name());}
+        if(updatedClient.cellphone() != null){objCliente.setCellphone(updatedClient.cellphone());}
+        if(updatedClient.document() != null){objCliente.setDocument(updatedClient.document());}
+        if(updatedClient.address() != null){objCliente.setAddress(updatedClient.address());}
 
         //Se guardan los cambios
         clienteRepo.save(objCliente);
