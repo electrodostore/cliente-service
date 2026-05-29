@@ -1,9 +1,12 @@
 package com.electrodostore.cliente_service.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 //Solo se definen datos que el cliente (view) puede ingresar o actualizar
 public record ClienteRequestDto(
-        String name,
-        String cellphone,
-        String document,
-        String address
+        @NotBlank String name,
+        @NotBlank String cellphone,
+        @NotBlank @Pattern(regexp = "\\d+") String document,
+        @NotBlank String address
 ) {}

@@ -4,6 +4,7 @@ import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 import com.electrodostore.cliente_service.service.IClienteService;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> saveCliente(@RequestBody ClienteRequestDto objNuevo){
+    public ResponseEntity<Long> saveCliente(@Valid @RequestBody ClienteRequestDto objNuevo){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(clienteService.saveCliente(objNuevo));
     }
@@ -57,7 +58,7 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponseDto> updateCliente(@PathVariable Long id, @RequestBody ClienteRequestDto updatedClient){
+    public ResponseEntity<ClienteResponseDto> updateCliente(@PathVariable Long id, @Valid @RequestBody ClienteRequestDto updatedClient){
         return ResponseEntity.ok(clienteService.updateCliente(id, updatedClient));
     }
 
@@ -75,14 +76,14 @@ public class ClienteController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<ClienteResponseDto> updateMe(@RequestBody ClienteRequestDto updatedClient){
+    public ResponseEntity<ClienteResponseDto> updateMe(@Valid @RequestBody ClienteRequestDto updatedClient){
         return ResponseEntity.ok(
                 clienteService.updateMe(updatedClient)
         );
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<ClienteResponseDto> patchMe(@RequestBody ClienteRequestDto updatedClient){
+    public ResponseEntity<ClienteResponseDto> patchMe(@Valid @RequestBody ClienteRequestDto updatedClient){
         return ResponseEntity.ok(
                 clienteService.patchMe(updatedClient)
         );
