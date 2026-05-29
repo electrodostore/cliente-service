@@ -160,8 +160,6 @@ public class ClienteService implements IClienteService{
     public ClienteResponseDto updateCliente(Long id, ClienteRequestDto updatedClient) {
         Cliente objCliente = findCliente(id);
 
-        validarEstadoCliente(objCliente);
-
         //Actualización completa de los datos del cliente
         objCliente.setName(updatedClient.name());
         objCliente.setCellphone(updatedClient.cellphone());
@@ -178,8 +176,6 @@ public class ClienteService implements IClienteService{
     @Transactional
     public ClienteResponseDto patchCliente(Long id, ClientePatchRequestDto updatedClient) {
         Cliente objCliente = findCliente(id);
-
-        validarEstadoCliente(objCliente);
 
         //Actualización parcial de los datos del cliente
         if(updatedClient.name() != null){
