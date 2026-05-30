@@ -1,6 +1,5 @@
 package com.electrodostore.cliente_service.service;
 
-import com.electrodostore.cliente_service.Integration.venta.dto.VentaDto;
 import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
 import com.electrodostore.cliente_service.dto.ClientePatchRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
@@ -8,32 +7,43 @@ import com.electrodostore.cliente_service.dto.ClienteResponseDto;
 
 import java.util.List;
 
-//Interfaz declarativa de las operaciones que hace el dominio Cliente
 public interface IClienteService {
 
-    //Consulta todos los clientes en un contexto administrativo
+    /**
+     * Consulta todos los clientes en un contexto administrativo
+     */
     List<ClienteResponseDto> findAllClientes();
 
-    //Consulta administrativa de un cliente
+    /**
+     * Consulta administrativa de un cliente
+     */
     ClienteResponseDto findClienteResponse(Long id);
 
-    //Consulta operacional de clientes activos
+    /**
+     * Consulta operacional de clientes activos
+     */
     ClienteResponseDto findActiveClient(Long id);
 
-    //Guardar registro
     Long saveCliente(ClienteRequestDto newClient);
 
-    //Se aplica Soft Delete para evitar perder datos históricos del usuario una vez se desactive
+    /**
+     * Se aplica el borrado lógico desactivando al cliente para
+     * evitar perder datos históricos importantes.
+     */
     void disableCliente(Long id);
 
-    //Actualización completa administrativa
+    /**
+     * Actualización administrativa total.
+     */
     ClienteResponseDto updateCliente(Long id, ClienteRequestDto updatedClient);
 
-    //Actualización parcial administrativa
+    /**
+     * Actualización administrativa parcial.
+     */
     ClienteResponseDto patchCliente(Long id, ClientePatchRequestDto updatedClient);
 
     /**
-     * Expone ventas de un determinado cliente y los datos de este mismo.
+     * Expone ventas y datos de un determinado cliente.
      *
      * Este método solo podrá ser accedido por administradores del sistema
      */

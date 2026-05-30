@@ -17,7 +17,6 @@ import java.util.List;
 @RequestMapping("/clientes")
 public class ClienteController {
 
-    //Inyección de dependencia por constructor para el service de Cliente
     private final IClienteService clienteService;
     public ClienteController(IClienteService clienteService){this.clienteService = clienteService;}
 
@@ -51,7 +50,6 @@ public class ClienteController {
                 .body(clienteService.saveCliente(objNuevo));
     }
 
-    //Soft Delete
     @PatchMapping("/{id}/disable")
     public ResponseEntity<Void> disableCliente(@PathVariable Long id){
         clienteService.disableCliente(id);

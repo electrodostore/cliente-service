@@ -1,18 +1,20 @@
 package com.electrodostore.cliente_service.Integration.venta.client;
 
-import com.electrodostore.cliente_service.Integration.venta.dto.VentaDto;
+import com.electrodostore.cliente_service.Integration.venta.dto.VentaIntegrationDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-//Clase cliente de venta-service donde se describirán cada uno de los end-points para las diferentes consultas
+/**
+ * Cliente Feign que realiza peticiones a
+ * venta-service
+ */
 @FeignClient(name = "venta-service") //Mismo nombre de registro en eureka-server
 public interface VentaFeignClient {
 
-    /*Descripción del método de venta-service que se encarga de buscar y traer la lista de ventas de un determinado
-      cliente por su id */
+    //Consulta ventas asociadas a un cliente.
     @GetMapping("/ventas/cliente/{clientId}")
-    List<VentaDto> findClienteVentas(@PathVariable Long clientId);
+    List<VentaIntegrationDto> findClienteVentas(@PathVariable Long clientId);
 }

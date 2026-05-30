@@ -4,7 +4,9 @@ import com.electrodostore.cliente_service.model.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-//Interfaz que hereda de la clase de Jpa que nos ofrece una gran cantidad de métodos disponibles para nuestras operaciones HTTP
+/***
+ * Repositorio de datos para cliente-service
+ */
 @Repository
 public interface IClienteRepository extends JpaRepository<Cliente, Long> {
 }

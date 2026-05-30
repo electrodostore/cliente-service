@@ -1,7 +1,7 @@
 package com.electrodostore.cliente_service.service;
 
 import com.electrodostore.cliente_service.Integration.venta.VentaIntegrationService;
-import com.electrodostore.cliente_service.Integration.venta.dto.VentaDto;
+import com.electrodostore.cliente_service.Integration.venta.dto.VentaIntegrationDto;
 import com.electrodostore.cliente_service.dto.ClienteConVentasDto;
 import com.electrodostore.cliente_service.dto.ClientePatchRequestDto;
 import com.electrodostore.cliente_service.dto.ClienteRequestDto;
@@ -10,7 +10,6 @@ import com.electrodostore.cliente_service.exception.ClienteNotFoundException;
 import com.electrodostore.cliente_service.exception.UnauthorizedOperationException;
 import com.electrodostore.cliente_service.model.Cliente;
 import com.electrodostore.cliente_service.repository.IClienteRepository;
-import feign.Client;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,25 +18,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ClienteService implements IClienteService{
 
-    //Inyección de dependencia para el repository de cliente
     private final IClienteRepository clienteRepo;
-    //Inyección de dependencia para el cliente de venta-service
     private final VentaIntegrationService ventaClient;
-    //Inyección por constructor
+
     public ClienteService(IClienteRepository clienteRepo, VentaIntegrationService ventaClient){
         this.clienteRepo = clienteRepo;
         this.ventaClient = ventaClient;
     }
 
-    //Método propio para sacar una instancia de la clase ClienteResponse que es la que se expone al cliente (view)
+    /**
+     * Construye DTO de respuesta para exponer un cliente.
+     */
     private ClienteResponseDto buildClienteResponse(Cliente objCliente){
         return new ClienteResponseDto(
                 objCliente.getId(),
@@ -49,15 +46,14 @@ public class ClienteService implements IClienteService{
         );
     }
 
-    //Método propio para buscar a un cliente por su id o throw exception en caso de que no exista
+    /**
+     * Busca cliente por su id o lanza excepción si no existe.
+     */
     private Cliente findCliente(Long id){
-        //Guardamos el objeto Cliente en un Optional para evitar problemas con el nullPointExceptiton
-        Optional<Cliente> objCliente = clienteRepo.findById(id);
-
-        //Si el objecto Optional está vacío -> Excepción personalizada
-        if(objCliente.isEmpty()){throw new ClienteNotFoundException("No se encontró cliente con id: " + id);}
-
-        return objCliente.get();
+        return clienteRepo.findById(id)
+                .orElseThrow(
+                () -> new ClienteNotFoundException("No se encontró cliente con id: " + id)
+        );
     }
 
     private void validarEstadoCliente(Cliente cliente){
@@ -66,12 +62,14 @@ public class ClienteService implements IClienteService{
         }
     }
 
-    //Extrae la identidad de cliente autenticado y retorna su id
+    /**
+     * Extrae la identidad de cliente autenticado y retorna su id
+     */
     private Long getAuthenticatedClientId(){
-        //Busca objeto con la información del token JWT
+        //Obtiene autenticación actual del usuario.
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        //Saca objeto Principal con todos los claims almacenamos en el token
+        //Recupera claims almacenados en el JWT
         Jwt principal = (Jwt) authentication.getPrincipal();
 
         //Busca identidad de negocio del usuario
@@ -100,15 +98,15 @@ public class ClienteService implements IClienteService{
     public List<ClienteResponseDto> findAllClientes() {
         List<ClienteResponseDto> listClientes = new ArrayList<>();
 
-        //Se va preparando uno a uno a los clientes para ser expuestos a la vista
         for(Cliente objCliente: clienteRepo.findAll()){
-            listClientes.add(buildClienteResponse(objCliente));
+            listClientes.add(
+                    buildClienteResponse(objCliente)
+            );
         }
 
         return listClientes;
     }
 
-    //Se expone el cliente a la vista pero en modo Response
     @Override
     @Transactional(readOnly = true)
     public ClienteResponseDto findClienteResponse(Long id) {
@@ -121,33 +119,29 @@ public class ClienteService implements IClienteService{
     @Transactional(readOnly = true)
     @Override
     public ClienteResponseDto findActiveClient(Long id) {
-        Cliente cliente = findCliente(
-                id
-        );
+        Cliente cliente = findCliente(id);
 
         validarEstadoCliente(cliente);
 
         return buildClienteResponse(cliente);
     }
 
-    @Override
     @Transactional
+    @Override
     public Long saveCliente(ClienteRequestDto newClient) {
         Cliente objCliente = new Cliente();
 
-        //Migramos datos del dto al objeto de la clase entidad
         objCliente.setName(newClient.name());
         objCliente.setCellphone(newClient.cellphone());
         objCliente.setDocument(newClient.document());
         objCliente.setAddress(newClient.address());
 
-        //Se guarda el registro
         return clienteRepo.save(objCliente).getId();
 
     }
 
-    @Override
     @Transactional
+    @Override
     public void disableCliente(Long id) {
         Cliente objCliente = findCliente(id);
 
@@ -155,8 +149,8 @@ public class ClienteService implements IClienteService{
         objCliente.setActive(false);
     }
 
-    @Override
     @Transactional
+    @Override
     public ClienteResponseDto updateCliente(Long id, ClienteRequestDto updatedClient) {
         Cliente objCliente = findCliente(id);
 
@@ -165,9 +159,6 @@ public class ClienteService implements IClienteService{
         objCliente.setCellphone(updatedClient.cellphone());
         objCliente.setDocument(updatedClient.document());
         objCliente.setAddress(updatedClient.address());
-
-        //Se guardan los cambios
-        clienteRepo.save(objCliente);
 
         return buildClienteResponse(objCliente);
     }
@@ -204,13 +195,11 @@ public class ClienteService implements IClienteService{
     @Transactional(readOnly = true)
     @Override
     public ClienteConVentasDto findClienteVentas(Long clientId) {
-        //Traemos al cliente dueño de las ventas
         Cliente objCliente = findCliente(clientId);
 
-        //Buscamos ventas del cliente
-        List<VentaDto> listVentas = ventaClient.findClienteVentas(clientId);
+        //Busca ventas del cliente en venta-service
+        List<VentaIntegrationDto> listVentas = ventaClient.findClienteVentas(clientId);
 
-        //Retornamos objeto de integración del cliente y sus ventas
         return new ClienteConVentasDto(
                 listVentas,
                 buildClienteResponse(objCliente)

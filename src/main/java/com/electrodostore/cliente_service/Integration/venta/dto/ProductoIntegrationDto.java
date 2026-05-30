@@ -7,12 +7,14 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+/**
+ * DTO usado para transportar los datos de los productos
+ * dentro de las ventas consultadas en venta-service.
+ */
 @Getter  @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-/*Clase DTO que almacena los datos de los productos que puedan estar en una venta comprada por un determinado
- cliente */
-public class ProductoDto {
+public class ProductoIntegrationDto {
 
     private Long id;
     private String name;
