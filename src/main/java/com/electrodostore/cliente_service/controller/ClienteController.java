@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,18 +21,21 @@ public class ClienteController {
     private final IClienteService clienteService;
     public ClienteController(IClienteService clienteService){this.clienteService = clienteService;}
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<ClienteResponseDto>> findAllClients(){
         return ResponseEntity.ok(clienteService.findAllClientes());
     }
 
     //Consulta administrativa de un cliente por su id
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ClienteResponseDto> findCliente(@PathVariable Long id){
         return ResponseEntity.ok(clienteService.findClienteResponse(id));
     }
 
     //Consulta solo clientes habilitados para realizar operaciones comerciales
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}/enabled")
     public ResponseEntity<ClienteResponseDto> findActiveClient(@PathVariable Long id){
         return ResponseEntity.ok(
@@ -39,6 +43,7 @@ public class ClienteController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{clientId}/ventas")
     public ResponseEntity<ClienteConVentasDto> findClienteVentas(@PathVariable Long clientId){
         return ResponseEntity.ok(clienteService.findClienteVentas(clientId));
@@ -50,23 +55,27 @@ public class ClienteController {
                 .body(clienteService.saveCliente(objNuevo));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{id}/disable")
     public ResponseEntity<Void> disableCliente(@PathVariable Long id){
         clienteService.disableCliente(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ClienteResponseDto> updateCliente(@PathVariable Long id, @Valid @RequestBody ClienteRequestDto updatedClient){
         return ResponseEntity.ok(clienteService.updateCliente(id, updatedClient));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<ClienteResponseDto> patchCliente(@PathVariable Long id, @RequestBody @Valid ClientePatchRequestDto updatedClient){
         return ResponseEntity.ok(clienteService.patchCliente(id, updatedClient));
     }
 
     //Busca datos del cliente autenticado
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
     public ResponseEntity<ClienteResponseDto> findMe(){
         return ResponseEntity.ok(
@@ -74,6 +83,7 @@ public class ClienteController {
         );
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/me")
     public ResponseEntity<ClienteResponseDto> updateMe(@Valid @RequestBody ClienteRequestDto updatedClient){
         return ResponseEntity.ok(
@@ -81,6 +91,7 @@ public class ClienteController {
         );
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/me")
     public ResponseEntity<ClienteResponseDto> patchMe(@RequestBody @Valid ClientePatchRequestDto updatedClient){
         return ResponseEntity.ok(
@@ -88,6 +99,7 @@ public class ClienteController {
         );
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me/ventas")
     public ResponseEntity<ClienteConVentasDto> findVentas(){
         return ResponseEntity.ok(
