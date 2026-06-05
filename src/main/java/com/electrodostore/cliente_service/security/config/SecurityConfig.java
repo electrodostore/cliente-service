@@ -53,7 +53,10 @@ public class SecurityConfig {
                  */
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
+                                .requestMatchers(
+                                        "/clientes",
+                                        "/actuator/**"
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
 
