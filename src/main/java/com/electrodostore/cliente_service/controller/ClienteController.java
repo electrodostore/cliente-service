@@ -75,7 +75,7 @@ public class ClienteController {
     }
 
     //Busca datos del cliente autenticado
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/me")
     public ResponseEntity<ClienteResponseDto> findMe(){
         return ResponseEntity.ok(
@@ -83,7 +83,7 @@ public class ClienteController {
         );
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('CLIENT')")
     @PutMapping("/me")
     public ResponseEntity<ClienteResponseDto> updateMe(@Valid @RequestBody ClienteRequestDto updatedClient){
         return ResponseEntity.ok(
@@ -91,7 +91,7 @@ public class ClienteController {
         );
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('CLIENT')")
     @PatchMapping("/me")
     public ResponseEntity<ClienteResponseDto> patchMe(@RequestBody @Valid ClientePatchRequestDto updatedClient){
         return ResponseEntity.ok(
@@ -99,7 +99,7 @@ public class ClienteController {
         );
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('CLIENT')")
     @GetMapping("/me/ventas")
     public ResponseEntity<ClienteConVentasDto> findVentas(){
         return ResponseEntity.ok(
