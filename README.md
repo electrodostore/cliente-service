@@ -1,157 +1,365 @@
+<div align="center">
+
 # 👤 Cliente Service
 
-## 📌 Descripción
-Microservicio encargado de la gestión de clientes dentro de ElectrodoStore. Permite registrar, consultar, actualizar y eliminar clientes, además de integrar información de ventas asociadas a cada cliente.
+### Microservicio de gestión de clientes
+#### ElectrodoStore · Spring Boot · OAuth2 Resource Server · OpenFeign
 
-Forma parte de una arquitectura de microservicios basada en Spring Cloud.
+![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
+![OAuth2](https://img.shields.io/badge/OAuth2_Resource_Server-EB5424?style=for-the-badge&logo=auth0&logoColor=white)
+![OpenFeign](https://img.shields.io/badge/OpenFeign-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![Resilience4j](https://img.shields.io/badge/Circuit_Breaker_+_Retry-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
 
----
-
-## ⚙️ Tecnologías utilizadas
-
-- Java + Spring Boot
-- Spring Data JPA
-- MySQL
-- Spring Cloud (Eureka Client)
-- OpenFeign (comunicación entre servicios)
-- Circuit-Breaker (Resiliencia entre microservicios)
+</div>
 
 ---
 
-## 🧩 Responsabilidades
+Cliente Service es responsable de la gestión de identidades de negocio dentro de **ElectrodoStore**.
 
-- Registrar nuevos clientes
-- Consultar clientes
-- Obtener detalle de un cliente
-- Actualizar información de clientes
-- Eliminar clientes
-- Consultar ventas asociadas a un cliente
+Administra la información comercial de los clientes y expone operaciones de consulta, actualización y deshabilitación, manteniendo separación respecto al dominio de autenticación gestionado por Auth Service.
+
+Implementa seguridad basada en **OAuth2 Resource Server**, ownership mediante claims JWT e integración distribuida con Venta Service.
 
 ---
 
-## 🗄️ Base de datos
+## 🎯 Responsabilidades
 
-Este servicio maneja su propia base de datos MySQL, siguiendo el patrón **Database per Service**, lo que garantiza independencia y desacoplamiento respecto a otros microservicios.
+- 👤 Gestión de clientes
+- ✏️ Actualización de información comercial
+- 🚫 Deshabilitación lógica de clientes
+- 📜 Consulta de historial de ventas
+- 🔐 Protección basada en ownership
+- 📡 Propagación de identidad entre microservicios
 
 ---
 
-## 🔗 Endpoints principales
+## 🧰 Stack tecnológico
 
-```http
-GET    /clientes
-GET    /clientes/{id}
-GET    /clientes/traer-ventas/{clientId}
-POST   /clientes
-PUT    /clientes/{id}
-PATCH  /clientes/{id}
-DELETE /clientes/{id}
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white)
+![OAuth2](https://img.shields.io/badge/OAuth2-EB5424?style=flat-square&logo=auth0&logoColor=white)
+![Spring JPA](https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat-square&logo=spring&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
+![OpenFeign](https://img.shields.io/badge/OpenFeign-6DB33F?style=flat-square&logo=spring&logoColor=white)
+![Eureka](https://img.shields.io/badge/Eureka-6DB33F?style=flat-square&logo=spring&logoColor=white)
+![LoadBalancer](https://img.shields.io/badge/LoadBalancer-6DB33F?style=flat-square&logo=spring&logoColor=white)
+![Resilience4j](https://img.shields.io/badge/Resilience4j-6DB33F?style=flat-square&logo=spring&logoColor=white)
+
+---
+
+## 📦 Modelo de dominio
+
+```mermaid
+flowchart LR
+
+Cliente["👤 Cliente"]
+
+Cliente --> Nombre["📝 Nombre"]
+Cliente --> Documento["🪪 Documento"]
+Cliente --> Telefono["📱 Teléfono"]
+Cliente --> Direccion["🏠 Dirección"]
+Cliente --> Estado["✅ Activo"]
 ```
+
+### Entidad Cliente
+
+| Campo | Descripción |
+| --- | --- |
+| `id` | Identificador del cliente |
+| `name` | Nombre completo |
+| `cellphone` | Teléfono de contacto |
+| `document` | Documento único |
+| `address` | Dirección |
+| `active` | Estado del cliente |
+
 ---
 
-## 🔄 Integración con otros servicios
+## 🔐 Modelo de seguridad
 
-Este microservicio se integra con:
+Cliente Service funciona como **OAuth2 Resource Server**. Los JWT son emitidos por Auth Service y validados localmente mediante RSA256.
 
-- **💳 venta-service** → para obtener las ventas asociadas a un cliente
+### Claims utilizados
 
-La comunicación se realiza mediante Spring Cloud OpenFeign, permitiendo invocar otros servicios de forma declarativa.
+| Claim | Descripción |
+| --- | --- |
+| `sub` | Username autenticado |
+| `userId` | Identificador interno del usuario |
+| `clientId` | Identificador del cliente |
+
+---
+
+## 👤 Ownership
+
+Las operaciones sobre la identidad comercial utilizan el claim `clientId` obtenido desde el JWT, lo que evita que un usuario pueda:
+
+- Consultar información de otros clientes
+- Modificar datos de otros clientes
+- Consultar ventas asociadas a otras cuentas
+
+### Endpoints propios
+
+| Método | Endpoint |
+| --- | --- |
+| `GET` | `/clientes/me` |
+| `PUT` | `/clientes/me` |
+| `PATCH` | `/clientes/me` |
+| `GET` | `/clientes/me/ventas` |
+
+> La identidad de negocio utilizada por estas operaciones proviene exclusivamente del claim `clientId`.
+
+---
+
+## 🔄 Relación con Auth Service
+
+Cliente Service y Auth Service representan dominios distintos.
+
+<table>
+<tr>
+<th>🔐 Auth Service</th>
+<th>👤 Cliente Service</th>
+</tr>
+<tr>
+<td>
+
+- Usuarios
+- Roles
+- Permisos
+- Autenticación
+
+</td>
+<td>
+
+- Información comercial
+- Datos de contacto
+- Historial comercial
+
+</td>
+</tr>
+</table>
+
+> Ambos dominios se relacionan mediante el identificador `clientId`.
+
+---
+
+## 🚫 Deshabilitación de clientes
+
+El servicio implementa borrado lógico mediante el atributo `active`. Cuando un cliente es deshabilitado:
+
+- Conserva su historial de ventas
+- Conserva referencias históricas en otros dominios
+- Mantiene la integridad de la información comercial
+
+> No se elimina información de forma física de la base de datos.
+
+---
+
+## ⚠️ Regla de negocio: identidad vs actividad comercial
+
+La deshabilitación de un cliente **no implica** la eliminación de su usuario autenticable.
+
+<table>
+<tr>
+<th>✅ Puede</th>
+<th>❌ No puede</th>
+</tr>
+<tr>
+<td>
+
+- Iniciar sesión
+- Consultar información histórica
+- Consultar ventas
+- Consultar su carrito
+
+</td>
+<td>
+
+- Registrar nuevas compras
+- Completar procesos de compra
+- Cancelar operaciones comerciales restringidas
+
+</td>
+</tr>
+</table>
+
+> Esta separación permite preservar el acceso a información histórica sin habilitar actividad comercial.
+
+---
+
+## 🔗 Integración con Venta Service
+
+```mermaid
+flowchart LR
+
+Cliente["👤 Cliente Service"]
+Feign["📡 OpenFeign + JWT"]
+Venta["💳 Venta Service"]
+
+Cliente --> Feign --> Venta
+```
+
+### Integración disponible
+
+| Servicio | Propósito |
+| --- | --- |
+| `venta-service` | Consulta de ventas asociadas a clientes |
+
+**Características:**
+
+- 🔗 Comunicación síncrona vía OpenFeign
+- 🪙 Propagación automática del JWT
+- 🔍 Descubrimiento dinámico mediante Eureka
+- ⚖️ Balanceo mediante Spring Cloud LoadBalancer
+
+---
+
+## 📜 Consulta de ventas
+
+Cliente Service consume Venta Service para consolidar información comercial.
+
+```mermaid
+flowchart TD
+
+A["👤 Cliente"]
+--> B["Cliente Service"]
+
+B --> C["💳 Venta Service"]
+
+C --> D["📜 Historial de ventas"]
+
+D --> B
+
+B --> E["📦 Respuesta consolidada"]
+```
+
+---
+
+## 🛡️ Resiliencia
+
+Las integraciones con Venta Service están protegidas mediante:
+
+| Mecanismo | Propósito |
+| --- | --- |
+| **Retry** | Reintentos automáticos ante fallos transitorios |
+| **Circuit Breaker** | Aislamiento de fallos |
+| **Fallback** | Respuestas controladas ante degradación |
+
+> Esto evita propagación de errores de infraestructura hacia los consumidores.
 
 ---
 
 ## ⚠️ Manejo de errores
 
-El servicio implementa un manejo centralizado de excepciones utilizando @RestControllerAdvice.
+Se utiliza manejo centralizado mediante `@RestControllerAdvice`, códigos de error de dominio, respuestas consistentes y traducción de errores distribuidos.
 
-### Excepciones manejadas:
-- **ClienteNotFoundException** → cuando un cliente no existe
-- **ServiceUnavailable** → cuando un servicio externo no responde
-
-### Estructura de respuesta de error:
-
-```bash
+```json
 {
-  "timestamp": "2026-03-28T12:00:00",
+  "timestamp": "...",
   "status": 404,
   "error": "NOT_FOUND",
   "errorCode": "CLIENT_NOT_FOUND",
   "mensaje": "Cliente no encontrado"
 }
 ```
-Esto garantiza respuestas consistentes y facilita el manejo de errores en el frontend o en otros microservicios.
 
 ---
 
-## 🌐 Registro en Eureka
+## 🌐 Endpoints
 
-El servicio se registra automáticamente en Eureka Server, permitiendo su descubrimiento dinámico dentro del ecosistema de microservicios.
+### 👨‍💼 Administración
+
+| Método | Endpoint | Descripción |
+| --- | --- | --- |
+| `GET` | `/clientes` | Listar clientes |
+| `GET` | `/clientes/{id}` | Obtener cliente |
+| `GET` | `/clientes/{clientId}/ventas` | Consultar ventas de un cliente |
+| `PUT` | `/clientes/{id}` | Actualización completa |
+| `PATCH` | `/clientes/{id}` | Actualización parcial |
+
+### ⚙️ Operacionales
+
+| Método | Endpoint | Descripción |
+| --- | --- | --- |
+| `GET` | `/clientes/{id}/enabled` | Consultar cliente habilitado |
+
+### 👤 Cuenta propia
+
+| Método | Endpoint | Descripción |
+| --- | --- | --- |
+| `GET` | `/clientes/me` | Obtener perfil |
+| `PUT` | `/clientes/me` | Actualizar perfil completo |
+| `PATCH` | `/clientes/me` | Actualización parcial |
+| `GET` | `/clientes/me/ventas` | Consultar ventas propias |
+
+### 🔗 Integración interna
+
+| Método | Endpoint | Descripción |
+| --- | --- | --- |
+| `POST` | `/clientes` | Registro de cliente desde Auth Service |
+
+### 📤 Endpoint compartido
+
+| Método | Endpoint | Uso |
+| --- | --- | --- |
+| `PATCH` | `/clientes/{id}/disable` | Deshabilitación de identidad de negocio |
+
+> Actualmente este endpoint puede ser utilizado tanto por administradores como por Auth Service durante la sincronización al deshabilitar usuarios con rol `CLIENT`.
 
 ---
 
-## ▶️ Ejecución local
+## 🏗️ Arquitectura
 
-> ⚠️ Requiere que **Config Server** y **Eureka Server** estén corriendo antes de iniciar este servicio.
-
-- **Con Maven**
-```bash
-# Corre en el puerto 8080
-mvn spring-boot:run
-```
-- **Con Docker**
-```bash
-docker build -t cliente-service .
-```
+- 🌐 API Gateway como punto único de entrada
+- 🔐 JWT validado localmente mediante OAuth2 Resource Server
+- 👤 Ownership basado en claim `clientId`
+- 🔗 Comunicación síncrona mediante OpenFeign
+- 🔍 Descubrimiento dinámico mediante Eureka
+- 🛡️ Resiliencia mediante Retry y Circuit Breaker
+- 🗄️ Database per Service
+- 🧩 Separación entre identidad de seguridad e identidad de negocio
 
 ---
 
-## 🔌 Configuración de red
+## 💡 Decisiones de diseño
 
-| Propiedad | Valor                  |
-|---|------------------------|
-| Puerto interno | `8080`                 |
-| Acceso externo | ❌ Solo vía API Gateway |
+<details>
+<summary><b>🧩 Separación de dominios</b></summary>
+<br>
+Cliente Service no administra usuarios, credenciales ni permisos. La autenticación pertenece a Auth Service, mientras que Cliente Service administra únicamente la identidad comercial.
+</details>
 
----
+<details>
+<summary><b>👤 Ownership basado en JWT</b></summary>
+<br>
+Las operaciones sobre recursos propios utilizan el claim <code>clientId</code> como identidad de negocio, evitando exponer identificadores sensibles en solicitudes del cliente.
+</details>
 
-## 🎯 Flujo destacado
+<details>
+<summary><b>🚫 Borrado lógico</b></summary>
+<br>
+La deshabilitación de clientes preserva información histórica y evita inconsistencias en otros dominios.
+</details>
 
-**Obtener cliente con sus ventas**
-1. Se consulta el cliente por ID
-2. Se realiza una llamada a venta-service
-3. Se agregan las ventas al DTO de respuesta
-4. Se retorna la información consolidada
+<details>
+<summary><b>📡 Propagación de identidad</b></summary>
+<br>
+Las integraciones distribuidas mantienen el contexto de seguridad mediante JWT propagado automáticamente por OpenFeign.
+</details>
 
----
-
-## 🛡️ Resiliencia (Circuit Breaker + Retry)
-
-La comunicación con **venta-service** está protegida mediante patrones de resiliencia utilizando **Resilience4j**:
-
-- **Circuit Breaker** → Evita llamadas repetidas a un servicio caído
-- **Retry** → Reintenta automáticamente en fallos transitorios
-- **Fallback** → Proporciona una respuesta controlada en caso de error
-
-### 🔁 Flujo de resiliencia
-
-1. Se intenta consumir el servicio de ventas
-2. Si falla, se realizan reintentos automáticos
-3. Si el fallo persiste, se activa el **Circuit Breaker**
-4. Se ejecuta el método **fallback**
-5. Se lanza una excepción controlada (`ServiceUnavailable`)
-
-### ⚠️ Fallback
-
-Cuando el servicio de ventas no está disponible:
-
-- Se registra un log de advertencia
-- Se lanza una excepción de tipo infraestructura
-- Se evita propagar errores internos al cliente
+<details>
+<summary><b>🗄️ Database per Service</b></summary>
+<br>
+Cliente Service mantiene su propia base de datos y no accede directamente a bases de datos externas.
+</details>
 
 ---
 
 ## 🚀 Mejoras futuras
 
-- Implementación de autenticación (JWT / OAuth2)
-- Validaciones más robustas
-- Paginación en consultas
-
----
+| Mejora | Descripción |
+| --- | --- |
+| 🔑 **M2M Auth** | Autenticación específica entre microservicios |
+| 📡 **Observabilidad** | Tracing distribuido y métricas |
+| 📄 **Paginación** | Consultas administrativas paginadas |
+| 📋 **Auditoría** | Registro de operaciones críticas |
+| 📨 **Eventos** | Integración asíncrona mediante Kafka o RabbitMQ |
+| 🔄 **Sincronización desacoplada** | Eventos de dominio para coordinación con Auth Service |
