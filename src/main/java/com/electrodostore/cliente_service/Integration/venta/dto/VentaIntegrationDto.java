@@ -21,5 +21,6 @@ public class VentaIntegrationDto {
     private LocalDate date;
     private Integer totalItems;
     private BigDecimal totalPrice;
+    VentaStatus status;
     private List<ProductoIntegrationDto> productsList = new ArrayList<>();
 }
